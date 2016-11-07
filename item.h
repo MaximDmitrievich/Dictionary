@@ -12,7 +12,9 @@ private:
     unsigned long long number;
     enum TColor color;
 public:
+    TItem(TItem *parent);
     TItem(unsigned long long num, char *kwrd);
+    bool IsNIL(TItem *it);
     TItem *Left();
     TItem *Right();
     TItem *Parent();
@@ -29,5 +31,6 @@ public:
     virtual ~TItem();
     void Deleterec();
 };
+
 
 #endif

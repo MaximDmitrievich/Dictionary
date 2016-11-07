@@ -28,6 +28,7 @@ int main()
             cin >> type;
             if (strcmp(type, "Save")) {
                 cin >> name;
+                dict->Save(name);
                 memset(name, 0, sizeof(char));
             } else if (strcmp(type, "Load")) {
 

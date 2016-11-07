@@ -5,6 +5,18 @@
 
 using namespace std;
 
+
+TItem::TItem(TItem *parent)
+{
+    left = nullptr;
+    right = nullptr;
+    this->parent = parent;
+    keyword = (char *) calloc(sizeof(char), 10);
+    strcpy(keyword, "___NIL___");
+    number = 0;
+    color = BLACK;
+}
+
 TItem::TItem(unsigned long long num, char *kwrd)
 {
     left = nullptr;
@@ -15,6 +27,7 @@ TItem::TItem(unsigned long long num, char *kwrd)
     number = num;
     color = RED;
 }
+
 TItem *TItem::Left()
 {
     if (this->left != nullptr) {
@@ -99,11 +112,13 @@ TItem::~TItem()
 }
 void TItem::Deleterec()
 {
-    if (this->left != nullptr) {
-        this->left->Deleterec();
+    if (this != nullptr) {
+        if (this->left != nullptr) {
+            this->left->Deleterec();
+        }
+        if (this->right != nullptr) {
+            this->right->Deleterec();
+        }
+        delete this;
     }
-    if (this->right != nullptr) {
-        this->right->Deleterec();
-    }
-    delete this;
 }
