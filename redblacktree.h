@@ -3,15 +3,18 @@
 #include "item.h"
 #include <cstdio>
 #include <cstdlib>
+#include <fstream>
 
+using namespace std;
+void ToLower(char *keyword);
 class TRBTree {
 private:
     TItem *root;
     void RightRotation(TItem *node);
     void LeftRotation(TItem *node);
     void DeleteFix(TItem *it);
-    void SaveRec(TItem *node, FILE *file);
-    void LoadRec(TItem *node, FILE *file);
+    void SaveRec(TItem *node, FILE *out);
+    void LoadRec(TItem *node, FILE *in);
 public:
     TRBTree();
     TItem *Search(char *keyword);

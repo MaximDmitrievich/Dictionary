@@ -12,6 +12,9 @@ TItem::TItem(TItem *parent)
     right = nullptr;
     this->parent = parent;
     keyword = (char *) calloc(sizeof(char), 10);
+    if (keyword == nullptr) {
+        cout <<"ERROR: Couldn't create keyword" << endl;
+    }
     strcpy(keyword, "___NIL___");
     number = 0;
     color = BLACK;
@@ -23,6 +26,9 @@ TItem::TItem(unsigned long long num, char *kwrd)
     right = nullptr;
     parent = nullptr;
     keyword = (char *) calloc(sizeof(char), 257);
+    if (keyword == nullptr) {
+        cout << "ERROR: Couldn't create keyword" << endl;
+    }
     strcpy(keyword, kwrd);
     number = num;
     color = RED;
@@ -54,15 +60,6 @@ TItem *TItem::Grandpa()
         } else return nullptr;
     } else return nullptr;
 }
-TItem *TItem::Uncle()
-{
-    if (this->Grandpa()) {
-        TItem *tmp = this->Grandpa();
-        if (this->Parent() == tmp->Left()) {
-            return tmp->right;
-        } else return tmp->left;
-    } else return nullptr;
-}
 void TItem::SetLeft(TItem *it)
 {
     this->left = it;
@@ -87,6 +84,11 @@ char *TItem::Keyword()
 {
     return this->keyword;
 }
+void TItem::FromItemToItem(TItem *right)
+{
+    this->keyword = right->keyword;
+    this->number = right->number;
+}
 TColor TItem::Color()
 {
     return this->color;
@@ -109,15 +111,18 @@ TItem::~TItem()
     left = nullptr;
     right = nullptr;
     parent = nullptr;
+    keyword = nullptr;
 }
 void TItem::Deleterec()
 {
     if (this != nullptr) {
         if (this->left != nullptr) {
             this->left->Deleterec();
+            this->left = nullptr;
         }
         if (this->right != nullptr) {
             this->right->Deleterec();
+            this->right = nullptr;
         }
         delete this;
     }

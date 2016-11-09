@@ -1,7 +1,7 @@
 #ifndef ITEM_H
 #define ITEM_H
 
-enum TColor { RED, BLACK };
+enum TColor { BLACK, RED };
 
 class TItem {
 private:
@@ -19,13 +19,13 @@ public:
     TItem *Right();
     TItem *Parent();
     TItem *Grandpa();
-    TItem *Uncle();
     void SetLeft(TItem *it);
     void SetRight(TItem *it);
     void SetParent(TItem *it);
     void SetColor(TColor color);
     unsigned long long Number();
     char *Keyword();
+    void FromItemToItem(TItem *right);
     TColor Color();
     TItem *Searchrec(char *keyword);
     virtual ~TItem();
