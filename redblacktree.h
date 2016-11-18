@@ -14,7 +14,7 @@ private:
     void LeftRotation(TItem *node);
     void DeleteFix(TItem *it);
     void SaveRec(TItem *node, FILE *out);
-    void LoadRec(TItem *node, FILE *in);
+    TItem *LoadRec(TItem *parent, FILE *in);
 public:
     TRBTree();
     TItem *Search(char *keyword);

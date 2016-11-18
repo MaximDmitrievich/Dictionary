@@ -22,8 +22,8 @@ TItem::TItem(TItem *parent)
 
 TItem::TItem(unsigned long long num, char *kwrd)
 {
-    left = nullptr;
-    right = nullptr;
+    left = new TItem(this);
+    right = new TItem(this);
     parent = nullptr;
     keyword = (char *) calloc(sizeof(char), 257);
     if (keyword == nullptr) {
@@ -62,10 +62,16 @@ TItem *TItem::Grandpa()
 }
 void TItem::SetLeft(TItem *it)
 {
+    if (this->left != nullptr && (strcmp(this->left->keyword, "___NIL___") == 0)) {
+        delete this->left;
+    }
     this->left = it;
 }
 void TItem::SetRight(TItem *it)
 {
+    if (this->right != nullptr && (strcmp(this->right->keyword, "___NIL___") == 0)) {
+        delete this->right;
+    }
     this->right = it;
 }
 void TItem::SetParent(TItem *it)
@@ -80,14 +86,34 @@ unsigned long long TItem::Number()
 {
     return this->number;
 }
+TItem *TItem::Min()
+{
+    if (strcmp(this->left->keyword, "___NIL___") == 0) {
+        return this->left->Min();
+    } else return this;
+}
+TItem *TItem::Successor()
+{
+    if (strcmp(this->right->keyword, "___NIL___") == 0) {
+        return this->right->Min();
+    }
+    TItem *temp = this;
+    TItem *temp2 = this->parent;
+    while (temp2 != nullptr && (strcmp(temp2->keyword, "___NIL___") == 0) && temp == temp2->right) {
+        temp = temp2;
+        temp2 = temp2->parent;
+    }
+    return temp2;
+}
+void TItem::CopyData(TItem *right)
+{
+    memset(this->keyword, 0, sizeof(char));
+    strcpy(this->keyword, right->keyword);
+    this->number = right->number;
+}
 char *TItem::Keyword()
 {
     return this->keyword;
-}
-void TItem::FromItemToItem(TItem *right)
-{
-    this->keyword = right->keyword;
-    this->number = right->number;
 }
 TColor TItem::Color()
 {
@@ -110,6 +136,12 @@ TItem::~TItem()
     free(this->keyword);
     left = nullptr;
     right = nullptr;
+    if (parent->left == this) {
+        parent->left = new TItem(parent);
+    }
+    if (parent->right == this) {
+        parent->right = new TItem(parent);
+    }
     parent = nullptr;
     keyword = nullptr;
 }
@@ -119,9 +151,15 @@ void TItem::Deleterec()
         if (this->left != nullptr) {
             this->left->Deleterec();
             this->left = nullptr;
+        } else if (this->left != nullptr && (strcmp(this->left->keyword, "___NIL___") == 0)) {
+            delete this->left;
+            this->left = nullptr;
         }
         if (this->right != nullptr) {
             this->right->Deleterec();
+            this->right = nullptr;
+        } else if (this->right != nullptr && (strcmp(this->right->keyword, "___NIL___") == 0)) {
+            delete this->right;
             this->right = nullptr;
         }
         delete this;

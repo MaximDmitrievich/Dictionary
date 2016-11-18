@@ -49,6 +49,8 @@ int main()
                 memset(name, 0, sizeof(char));
             } else if (strcmp(type, "Load")) {
                 cin >> name;
+                delete dict;
+                dict = new TRBTree();
                 dict->Load(name);
                 memset(name, 0, sizeof(char));
             }

@@ -41,6 +41,7 @@ void TRBTree::Output(char *keyword)
 }
 void TRBTree::RightRotation(TItem *node)
 {
+    cout << "ROTATION" << endl;
     TItem *node2 = node->Left();
     node->SetLeft(node2->Right());
     if (!IsNIL(node2->Right())) {
@@ -62,9 +63,11 @@ void TRBTree::RightRotation(TItem *node)
     }
     node2->SetRight(node);
     node->SetParent(node2);
+    cout << "ROTATED-RIGHT" << endl;
 }
 void TRBTree::LeftRotation(TItem *node)
 {
+    cout << "ROTATION" << endl;
     TItem *node2 = node->Right();
     node->SetRight(node2->Left());
     if (!IsNIL(node2->Left())) {
@@ -86,6 +89,7 @@ void TRBTree::LeftRotation(TItem *node)
     }
     node2->SetLeft(node);
     node->SetParent(node2);
+    cout << "ROTATED-LEFT" << endl;
 }
 
 void TRBTree::Insert(unsigned long long number, char *keyword)
@@ -94,8 +98,6 @@ void TRBTree::Insert(unsigned long long number, char *keyword)
     TItem *in = nullptr;
     if (root == nullptr) {
         root = new TItem(number, keyword);
-        root->SetLeft(new TItem(root));
-        root->SetRight(new TItem(root));
         root->SetColor(BLACK);
     } else {
         TItem *current = root;
@@ -110,8 +112,6 @@ void TRBTree::Insert(unsigned long long number, char *keyword)
                 } else {
                     in = new TItem(number, keyword);
                     in->SetParent(current);
-                    in->SetLeft(new TItem(in));
-                    in->SetRight(new TItem(in));
                     current->SetRight(in);
                     break;
                 }
@@ -121,8 +121,6 @@ void TRBTree::Insert(unsigned long long number, char *keyword)
                 } else {
                     in = new TItem(number, keyword);
                     in->SetParent(current);
-                    in->SetLeft(new TItem(in));
-                    in->SetRight(new TItem(in));
                     current->SetLeft(in);
                     break;
                 }
@@ -148,7 +146,7 @@ void TRBTree::Insert(unsigned long long number, char *keyword)
                     grandpa->SetColor(RED);
                     this->RightRotation(grandpa);
                 }
-            } else {
+            } else if (parent == grandpa->Right()) {
                 TItem *node = grandpa->Left();
                 if ((node->Color()) == RED) {
                     parent->SetColor(BLACK);
@@ -204,7 +202,7 @@ void TRBTree::DeleteFix(TItem *it)
                 this->LeftRotation(temp);
                 it = this->root;
             }
-        } else {
+        } else if (it == (temp->Right())) {
             temp2 = temp->Left();
             if (temp2->Color() == RED) {
                 temp2->SetColor(BLACK);
@@ -238,57 +236,37 @@ void TRBTree::DeleteFix(TItem *it)
 void TRBTree::Delete(char *keyword)
 {
     TItem *temp = this->Search(keyword);
+    TItem *temp2 = nullptr;
+    TItem *temp3 = nullptr;
     if (temp && !IsNIL(temp)) {
-        TItem *parent = temp->Parent();
-        if (!IsNIL(temp->Right()) && IsNIL(temp->Left())) {
-            if (!parent) {
-                this->root = temp->Right();
-            } else if (parent->Right() == temp) {
-                parent->SetRight(temp->Right());
-            } else if (parent->Left() == temp) {
-                parent->SetLeft(temp->Right());
-            }
-            if (parent && parent->Color() == BLACK) {
-                this->DeleteFix(temp);
-            }
-        } else if (IsNIL(temp->Right()) && !IsNIL(temp->Left())) {
-            if (!parent) {
-                this->root = temp->Left();
-            } else if (parent->Right() == temp) {
-                parent->SetRight(temp->Left());
-            } else if (parent->Left() == temp) {
-                parent->SetLeft(temp->Left());
-            }
-            if (parent && parent->Color() == BLACK) {
-                this->DeleteFix(temp);
-            }
-        } else if (!IsNIL(temp->Right()) && !IsNIL(temp->Left())) {
-            if (!parent) {
-                this->root = temp->Right();
-            } else if (parent->Right() == temp) {
-                parent->SetLeft(temp->Right());
-            } else if (parent->Left() == temp) {
-                parent->SetLeft(temp->Right());
-            }
-
-            TItem *temp2 = temp->Right();
-            while (!IsNIL(temp2->Left())) {
-                temp2 = temp2->Left();
-            }
-            temp2->SetLeft(temp->Left());
-            if (parent && parent->Color() == BLACK) {
-                this->DeleteFix(temp2);
-            }
+        if (IsNIL(temp->Left()) && IsNIL(temp->Right())) {
+            temp2 = temp;
         } else {
-            if (!parent) {
-                this->root = nullptr;
-            } else if (parent->Right() == temp) {
-                parent->SetRight(new TItem(parent));
-            } else if (parent->Left() == temp) {
-                parent->SetLeft(new TItem(parent));
+            temp2 = temp->Successor();
+        }
+        if (!IsNIL(temp2->Left())) {
+            temp3 = temp2->Left();
+        } else if (!IsNIL(temp2->Right())) {
+            temp3 = temp2->Right();
+        }
+        TItem *parent = temp2->Parent();
+        temp3->SetParent(parent);
+        if (IsNIL(temp2->Parent())) {
+            this->root = temp3;
+        } else {
+            if (temp2 == parent->Left()) {
+                parent->SetLeft(temp3);
+            } else if (temp2 == parent->Right()) {
+                parent->SetRight(temp3);
             }
         }
-        delete temp;
+        if (temp2 != temp) {
+            temp->CopyData(temp2);
+        }
+        if (temp2->Color() == BLACK) {
+            this->DeleteFix(temp2);
+        }
+        delete temp2;
         cout << "OK" << endl;
     } else {
         cout << "NoSuchWord" << endl;
@@ -297,45 +275,31 @@ void TRBTree::Delete(char *keyword)
 
 void TRBTree::SaveRec(TItem *node, FILE *out)
 {
-    if (root == nullptr) {
-        //fwrite("NIL", sizeof(char), 3, out);
-        //fwrite("NIL", sizeof(char), 3, out);
-        //fwrite("0", sizeof(char), 1, out);
-        fprintf(out, "NIL");
-        fprintf(out, "NIL");
-        fprintf(out, "0");
+    char nod = 0;
+    if (node == nullptr) {
+        nod = 0;
+        fprintf(out, "%c\n", nod);
         return;
-    }
-    if (IsNIL(node)) {
-        //fwrite("NIL", sizeof(char), 3, out);
-        //fwrite("NIL", sizeof(char), 3, out);
-        //fwrite("0", sizeof(char), 1, out);
-        fprintf(out, "NIL");
-        fprintf(out, "NIL");
-        fprintf(out, "0");
+    } else if (!IsNIL(node->Left()) && !IsNIL(node->Right())) {
+        nod = 1;
+        fprintf(out, "%c\n", nod);
+    } else {
+        nod = 2;
+        fprintf(out, "%c\n", nod);
         return;
     }
     unsigned long long number = node->Number();
     char *keyword = node->Keyword();
     TColor color = node->Color();
-    //fwrite(&number, sizeof(unsigned long long), 1, out);
-    fprintf(out, "%llu", number);
-    //fwrite(&keyword, sizeof(char), strlen(keyword), out);
-    fprintf(out, "%s", keyword);
-    //fwrite(&color, sizeof(TColor), 1, out);
-    fprintf(out, "%d", color);
-    //fwrite("(", sizeof(char), 1, out);
-    fprintf(out, "(");
+    fprintf(out, "%llu\n", number);
+    fprintf(out, "%s\n", keyword);
+    fprintf(out, "%d\n", color);
     if (node->Left()) {
         this->SaveRec(node->Left(), out);
     }
-    //fwrite(",", sizeof(char), 1, out);
-    fprintf(out, ",");
     if (node->Right()) {
         this->SaveRec(node->Right(), out);
     }
-    //fwrite(")", sizeof(char), 1, out);
-    fprintf(out, ")");
 }
 
 void TRBTree::Save(char *name)
@@ -344,21 +308,42 @@ void TRBTree::Save(char *name)
     if (out) {
         this->SaveRec(root, out);
         fclose(out);
+        cout << "OK" << endl;
     } else {
         cout << "ERROR: Couldn't create file" << endl;
     }
 }
 
-void TRBTree::LoadRec(TItem *node, FILE *in)
+TItem *TRBTree::LoadRec(TItem *parent, FILE *in)
 {
-
+    char nod;
+    unsigned long long num = 0;
+    char *keyword = (char *) calloc(sizeof(char), 257);
+    TColor color;
+    fscanf(in, "%c", &nod);
+    if (nod == 1) {
+        fscanf(in, "%llu", &num);
+        fscanf(in, "%s", keyword);
+        fscanf(in, "%d", (int*)&color);
+        TItem *item = new TItem(num, keyword);
+        item->SetColor(color);
+        item->SetLeft(this->LoadRec(item, in));
+        item->SetRight(this->LoadRec(item, in));
+        return item;
+    } else if (nod == 0) {
+        TItem *nil = new TItem(parent);
+        return nil;
+    } else {
+        return nullptr;
+    }
 }
 void TRBTree::Load(char *name)
 {
-    FILE *in = fopen(name, "rb");
+    FILE *in = fopen(name, "r");
     if (in) {
-        this->SaveRec(root, in);
+        root = this->LoadRec(root, in);
         fclose(in);
+        cout << "OK" << endl;
     } else {
         cout << "ERROR: Couldn't create file" << endl;
     }

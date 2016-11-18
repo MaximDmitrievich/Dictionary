@@ -24,8 +24,10 @@ public:
     void SetParent(TItem *it);
     void SetColor(TColor color);
     unsigned long long Number();
+    TItem *Min();
+    TItem *Successor();
+    void CopyData(TItem *right);
     char *Keyword();
-    void FromItemToItem(TItem *right);
     TColor Color();
     TItem *Searchrec(char *keyword);
     virtual ~TItem();
