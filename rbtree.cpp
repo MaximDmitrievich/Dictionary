@@ -43,17 +43,15 @@ TRBTree::TNode *TRBTree::Successor(TNode *node)
 
 TRBTree::TNode *TRBTree::Recoursesearch(char *keyword, TNode *node)
 {
-    if (node == nullptr) {
+    if (node == nil) {
         return nullptr;
-    } else if (strcmp(keyword, node->keyword) == 0 || node == nil) {
+    } else if (strcmp(keyword, node->keyword) == 0) {
         return node;
     } else if (strcmp(keyword, node->keyword) > 0) {
         return Recoursesearch(keyword, node->right);
     } else if (strcmp(keyword, node->keyword) < 0) {
         return Recoursesearch(keyword, node->left);
-    } else {
-        return nullptr;
-    }
+    } else return nullptr;
 }
 
 void TRBTree::Recoursedestroy(TNode *node)
@@ -102,7 +100,7 @@ void TRBTree::RightRotation(TNode *node)
         if (node == node->parent->right) {
             node->parent->right = tmp;
         } else if (node == node->parent->left) {
-            node->parent->right = tmp;
+            node->parent->left = tmp;
         }
     }
     tmp->right = node;
@@ -243,7 +241,8 @@ void TRBTree::Insert(char *keyword, unsigned long long number)
                 current = current->right;
             }
         }
-        current = CreateNode(parent, keyword, number);
+        TNode *newnode = CreateNode(parent, keyword, number);
+        current = newnode;
         InsertFix(current);
     }
     cout << "OK" << endl;
@@ -255,7 +254,7 @@ void TRBTree::Search(char *keyword)
         return;
     }
     TNode *out = Recoursesearch(keyword, this->root);
-    if (out != nullptr || out != nil) {
+    if (out != nullptr) {
         cout << "OK: " << out->number << endl;
     } else {
         cout << "NoSuchWord" << endl;
@@ -273,7 +272,7 @@ void TRBTree::Delete(char *keyword)
     if (deleting->left == nil || deleting->right == nil) {
         next = deleting;
     } else {
-        next = Minimum(deleting->right);
+        next = Successor(deleting->right);
     }
     if (next->left != nil) {
         temp = next->left;
