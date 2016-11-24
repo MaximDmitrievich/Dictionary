@@ -27,9 +27,8 @@ private:
         TNode *parent;
     };
     TNode *root;
+    TNode *nil;
 
-    bool IsNIL(TNode *node);
-    TNode *CreateNIL(TNode *parent);
     TNode *CreateNode(TNode *parent, char *keyword, unsigned long long number);
     TNode *Minimum(TNode *node);
     TNode *Successor(TNode *node);
