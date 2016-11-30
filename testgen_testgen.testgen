@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+
+import random
+import string
+import sys
+import copy
+
+def generate_key(maxLeyLen):
+	buf = [str(random.choice(string.ascii_letters)) for _ in range(0, random.randint(1, maxLeyLen))]
+	return  "".join(buf)
+
+def main():
+    keys = []
+    keys2 = []
+    if len(sys.argv) == 1:
+        print("Usage: [line count] [max key lenght(default 256)] [serialization mode(default no)]")
+        return
+    else:
+        count = int(sys.argv[1])
+    maxLeyLen = 256 if len(sys.argv) <= 2 else int(sys.argv[2])
+    serMode = True
+    allAction = "+"*25 + "-"*15 + "k"*7;
+    if serMode:
+        allAction += "!"*3
+        fileExist = False
+    for _ in range(0, count):
+        action = random.choice(allAction);
+        if action == "+":
+            key = generate_key(maxLeyLen).lower()
+            value = random.randint(0, 2**64 - 1)
+            if not key in keys:
+                keys.append(key)
+                print(action + ' ' +  key + ' ' + str(value))
+        elif action == "-":
+            key = generate_key(maxLeyLen).lower() if not len(keys) else keys[random.randint(0, len(keys) - 1)]
+            print(action + ' ' + key)
+            if key in keys:
+                keys.remove(key)
+        elif action == "!":
+            newAction = random.choice("LS")
+            if fileExist and newAction == "L":
+                print("! Load BTree.bin")
+                keys = copy.copy(keys2)
+            else:
+                print("! Save BTree.bin")
+                fileExist = True
+                keys2 = copy.copy(keys)
+        elif action == "k":
+            if random.randint(0, 1) == 1 and len(keys) > 0:
+                key = keys[random.randint(0, len(keys) - 1)]
+            else:
+                key = generate_key(maxLeyLen)
+                print(key)
+    for i in range(0, len(keys)):
+        print("- " + keys[i])
+
+if __name__ == "__main__":
+	main()

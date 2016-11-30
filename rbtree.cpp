@@ -294,7 +294,7 @@ void TRBTree::Insert(char *keyword, unsigned long long number)
 void TRBTree::Search(char *keyword)
 {
     if (this->root == nil) {
-        cout << "ERROR: couldn't start search, because the root of the tree is nullptr" << endl;
+        cout << "ERROR: couldn't start search, because dictionary is emtpy" << endl;
         return;
     }
     TNode *out = Recoursesearch(keyword, this->root);
@@ -362,9 +362,13 @@ void TRBTree::Load(const char *path)
         cout << "ERROR: Couldn't open file" << endl;
         return;
     }
+    if (file.eof()) {
+        file.close();
+        return;
+    }
     TNode *newnode = Deser(nil, file);
-    if (newnode != nil) {
-        if (this->root != nullptr) {
+    if (newnode != nil || newnode != nullptr) {
+        if (this->root != nil) {
             Recoursedestroy(this->root);
         }
         this->root = newnode;
