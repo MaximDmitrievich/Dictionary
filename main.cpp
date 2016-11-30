@@ -43,14 +43,12 @@ int main(int argv, char **argc)
             memset(keyword, 0, sizeof(char));
         } else if (action == '!') {
             cin >> type;
-            if (strcmp(type, "Save")) {
+            if (strcmp(type, "Save") == 0) {
                 cin >> name;
                 dict->Save(name);
                 memset(name, 0, sizeof(char));
-            } else if (strcmp(type, "Load")) {
+            } else if (strcmp(type, "Load") == 0) {
                 cin >> name;
-                delete dict;
-                dict = new TRBTree();
                 dict->Load(name);
                 memset(name, 0, sizeof(char));
             }

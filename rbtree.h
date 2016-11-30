@@ -12,7 +12,10 @@ using namespace std;
 const int KEY_SIZE = 257;
 const int NIL_SIZE = 8;
 const int TYPE_SIZE = 5;
-const int NAME_SIZE = 30;
+const int NAME_SIZE = 20;
+const int NIL = 0;
+const int NO_CHILDREN = 1;
+const int CHILDERN = 2;
 
 enum TColor {RED, BLACK};
 
@@ -44,7 +47,7 @@ private:
     void DeleteFix(TNode *node);
 
     void Ser(TNode *node, ofstream &file);
-    TNode *Deser(ifstream &file);
+    TNode *Deser(TNode *parent, ifstream &file);
 
 public:
     TRBTree();
