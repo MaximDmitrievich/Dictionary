@@ -5,16 +5,10 @@ TRBTree::TNode *TRBTree::CreateNode(TNode *parent, char *keyword, unsigned long 
     TNode *node = (TNode *) malloc(sizeof(TNode));
     if (node == nullptr) {
         cout << "ERROR: couldn't malloc a lot of memory for new node" << endl;
-        return nullptr;
+        exit(EXIT_SUCCESS);
     }
     node->number = number;
-    node->keyword = (char *) calloc(sizeof(char), KEY_SIZE);
-    if (node->keyword == nullptr) {
-        cout << "ERROR: couldn't calloc a lot of memory for keyword in new node" << endl;
-        free(node);
-        return nullptr;
-    }
-    strcpy(node->keyword, keyword);
+    node->keyword = keyword;
     node->color = RED;
     node->left = nil;
     node->right = nil;
@@ -63,7 +57,9 @@ void TRBTree::Recoursedestroy(TNode *node)
         Recoursedestroy(node->right);
     }
     free(node->keyword);
-    free(node);
+    TNode *tmp = node;
+    free(tmp);
+    node = nil;
 }
 
 void TRBTree::LeftRotation(TNode *node)
@@ -235,11 +231,11 @@ TRBTree::TNode *TRBTree::Deser(TNode *parent, ifstream &file)
         return nil;
     }
     size_t length;
-    char keywordbuf[KEY_SIZE] = { '\0' };
     unsigned long long number = 0;
     file.read((char *) &length, sizeof(size_t));
+    char *keywordbuf = (char *) calloc(sizeof(char), length + 1);
     file.read(keywordbuf, length);
-    keywordbuf[length] = '\0';
+    keywordbuf[length + 1] = '\0';
     file.read((char *) &number, sizeof(unsigned long long));
     TNode *node = CreateNode(parent, keywordbuf, number);
     file.read((char *) &node->color, sizeof(TColor));
@@ -259,42 +255,38 @@ TRBTree::TRBTree()
 
 void TRBTree::Insert(char *keyword, unsigned long long number)
 {
-    if (this->root == nil) {
-        this->root = CreateNode(nil, keyword, number);
-        this->root->color = BLACK;
-    } else {
-        TNode *current = this->root;
-        TNode *parent = nullptr;
-        char cmp;
-        while (current != nil) {
-            cmp = strcmp(keyword, current->keyword);
-            if (cmp == 0) {
-                cout << "Exist" << endl;
-                return;
-            } else if (cmp < 0) {
-                parent = current;
-                current = current->left;
-            } else if (cmp > 0) {
-                parent = current;
-                current = current->right;
-            }
-        }
-        current = nullptr;
-        current = CreateNode(parent, keyword, number);
+    TNode *parent = nil;
+    TNode *current = this->root;
+    int cmp;
+    while (current != nil) {
+        cmp = strcmp(keyword, current->keyword);
+        parent = current;
         if (cmp < 0) {
-            parent->left = current;
+            current = current->left;
+        } else if (cmp > 0) {
+            current = current->right;
         } else {
-            parent->right = current;
+            cout << "Exist" << endl;
+            return;
         }
-        current->color = RED;
-        InsertFix(current);
     }
+    TNode *newnode = CreateNode(parent, keyword, number);
+    if (parent == nil) {
+        this->root = newnode;
+    } else {
+        if (cmp < 0) {
+            parent->left = newnode;
+        } else {
+            parent->right = newnode;
+        }
+    }
+    InsertFix(newnode);
     cout << "OK" << endl;
 }
 void TRBTree::Search(char *keyword)
 {
     if (this->root == nil) {
-        cout << "ERROR: couldn't start search, because dictionary is emtpy" << endl;
+        cout << "NoSuchWord" << endl;
         return;
     }
     TNode *out = Recoursesearch(keyword, this->root);
@@ -312,11 +304,11 @@ void TRBTree::Delete(char *keyword)
         return;
     }
     TNode *removed = node;
-    TNode *newnode = nil;
+    TNode *newnode = nullptr;
     if (node->left == nil || node->right == nil) {
         removed = node;
     } else {
-        removed = Minimum(node);
+        removed = Minimum(node->right);
     }
     if (removed->left != nil) {
         newnode = removed->left;
