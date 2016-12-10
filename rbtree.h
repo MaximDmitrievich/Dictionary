@@ -9,9 +9,8 @@
 using namespace std;
 
 
-const int KEY_SIZE = 257;
-const int NIL_SIZE = 8;
-const int TYPE_SIZE = 5;
+const int KEY_SIZE = 256;
+const int TYPE_SIZE = 4;
 const int NAME_SIZE = 20;
 const int NIL = 0;
 const int NO_CHILDREN = 1;

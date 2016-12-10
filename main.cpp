@@ -1,34 +1,27 @@
 #include "rbtree.h"
+#include <map>
 
 using namespace std;
 
 void ToLower(char *keyword)
 {
-    if (*keyword >= 'A' && *keyword <= 'Z') {
-        *keyword = 'a' + (*keyword - 'A');
+    while (*keyword) {
+        if (*keyword >= 'A' && *keyword <= 'Z') {
+            *keyword = 'a' + (*keyword - 'A');
+        }
+        keyword++;
     }
 }
 
 int main(int argv, char **argc)
 {
     char *keyword = nullptr;
-    char *type = (char *) calloc(sizeof(char), TYPE_SIZE);
-    if (type == nullptr) {
-        cout << "ERROR: Couldn't create variable type" << endl;
-        exit(EXIT_SUCCESS);
-    }
-    char *name = (char *) calloc(sizeof(char), NAME_SIZE);
-    if (name == nullptr) {
-        cout << "ERROR: Couldn't create variable name" << endl;
-        free(type);
-        exit(EXIT_SUCCESS);
-    }
+    char type[TYPE_SIZE] = { '\0' };
+    char name[NAME_SIZE] = { '\0' };
     unsigned long long number = 0;
     TRBTree *dict = new TRBTree();
     if (dict == nullptr) {
-        cout << "ERROR: Couldn't create dictionary" << endl;
-        free(type);
-        free(name);
+        cout << "ERROR: Couldn't create dictionary\n";
         exit(EXIT_SUCCESS);
     }
     char action;
@@ -37,7 +30,7 @@ int main(int argv, char **argc)
             keyword = nullptr;
             keyword = (char *) calloc(sizeof(char), KEY_SIZE);
             if (keyword == nullptr) {
-                cout << "ERROR: Couldn't create variable keyword" << endl;
+                cout << "ERROR: Couldn't create variable keyword\n";
                 continue;
             }
             cin >> keyword;
@@ -64,13 +57,10 @@ int main(int argv, char **argc)
             ungetc(action, stdin);
             char buf[KEY_SIZE] = { '\0' };
             cin >> buf;
-            buf[KEY_SIZE] = '\0';
             ToLower(buf);
             dict->Search(buf);
         }
     }
-    free(type);
-    free(name);
     delete dict;
     return 0;
 }
