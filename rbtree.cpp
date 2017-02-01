@@ -10,25 +10,25 @@ TRBTree::TNode *TRBTree::CreateNode(TNode *parent, char *keyword, unsigned long 
     node->number = number;
     node->keyword = keyword;
     node->color = RED;
-    node->left = nil;
-    node->right = nil;
+    node->left = &nil;
+    node->right = &nil;
     node->parent = parent;
     return node;
 }
 TRBTree::TNode *TRBTree::Minimum(TNode *node)
 {
-    while (node->left != nil) {
+    while (node->left != &nil) {
         node = node->left;
     }
     return node;
 }
 TRBTree::TNode *TRBTree::Successor(TNode *node)
 {
-    if (node->right != nil) {
+    if (node->right != &nil) {
         return Minimum(node->right);
     }
     TNode *parent = node->parent;
-    while (parent != nil && node == parent->right) {
+    while (parent != &nil && node == parent->right) {
         node = parent;
         parent = parent->parent;
     }
@@ -37,40 +37,42 @@ TRBTree::TNode *TRBTree::Successor(TNode *node)
 
 TRBTree::TNode *TRBTree::Recoursesearch(char *keyword, TNode *node)
 {
-    if (node == nil) {
-        return nil;
-    } else if (strcmp(keyword, node->keyword) == 0) {
+    if (node == &nil) {
+        return &nil;
+    }
+    char cmp = strcasecmp(keyword, node->keyword);
+    if (cmp == 0) {
         return node;
-    } else if (strcmp(keyword, node->keyword) > 0) {
+    } else if (cmp > 0) {
         return Recoursesearch(keyword, node->right);
-    } else if (strcmp(keyword, node->keyword) < 0) {
+    } else if (cmp < 0) {
         return Recoursesearch(keyword, node->left);
     } else return nullptr;
 }
 
 void TRBTree::Recoursedestroy(TNode *node)
 {
-    if (node->left != nil) {
+    if (node->left != &nil) {
         Recoursedestroy(node->left);
     }
-    if (node->right != nil) {
+    if (node->right != &nil) {
         Recoursedestroy(node->right);
     }
     free(node->keyword);
     TNode *tmp = node;
     free(tmp);
-    node = nil;
+    node = &nil;
 }
 
 void TRBTree::LeftRotation(TNode *node)
 {
-    TNode *tmp = node->right;
-    node->right = tmp->left;
-    if (tmp->left != nil) {
-        tmp->left->parent = node;
+TNode *tmp = node->right;
+node->right = tmp->left;
+if (tmp->left != &nil) {
+    tmp->left->parent = node;
     }
     tmp->parent = node->parent;
-    if (node->parent == nil) {
+    if (node->parent == &nil) {
         this->root = tmp;
     } else if (node == node->parent->left) {
         node->parent->left = tmp;
@@ -84,11 +86,11 @@ void TRBTree::RightRotation(TNode *node)
 {
     TNode *tmp = node->left;
     node->left = tmp->right;
-    if (tmp->right != nil) {
+    if (tmp->right != &nil) {
         tmp->right->parent = node;
     }
     tmp->parent = node->parent;
-    if (node->parent == nil) {
+    if (node->parent == &nil) {
         this->root = tmp;
     } else if (node == node->parent->left) {
         node->parent->left = tmp;
@@ -195,63 +197,64 @@ void TRBTree::DeleteFix(TNode *node)
 
 void TRBTree::Ser(TNode *node, ofstream &file)
 {
-    int num = NIL;
-    if (node == nil) {
+    char num = NIL;
+    if (node == &nil) {
         num = NIL;
-        file.write((char *) &num, sizeof(int));
+        file.write((char *) &num, sizeof(num));
         return;
-    } else if (node->left == nil && node->right == nil) {
+    } else if (node->left == &nil && node->right == &nil) {
         num = NO_CHILDREN;
     } else {
         num = CHILDERN;
     }
     size_t length = strlen(node->keyword);
-    file.write((char *) &num, sizeof(int));
-    file.write((char *) &length, sizeof(size_t));
+    file.write((char *) &num, sizeof(num));
+    file.write((char *) &length, sizeof(length));
     file.write(node->keyword, length);
-    file.write((char *) &node->number, sizeof(unsigned long long));
-    file.write((char *) &node->color, sizeof(TColor));
+    file.write((char *) &node->number, sizeof(node->number));
+    file.write((char *) &node->color, sizeof(node->color));
     Ser(node->left, file);
     Ser(node->right, file);
 }
 
 TRBTree::TNode *TRBTree::Deser(TNode *parent, ifstream &file)
 {
-    int num = 0;
-    file.read((char *) &num, sizeof(int));
+    char num = 0;
+    file.read((char *) &num, sizeof(char));
     if (num == NIL) {
-        return nil;
+        return &nil;
     }
     size_t length;
     unsigned long long number = 0;
-    file.read((char *) &length, sizeof(size_t));
+    file.read((char *) &length, sizeof(length));
     char *keywordbuf = (char *) calloc(sizeof(char), length + 1);
     file.read(keywordbuf, length);
-    keywordbuf[length + 1] = '\0';
+    keywordbuf[length] = '\0';
     file.read((char *) &number, sizeof(unsigned long long));
     TNode *node = CreateNode(parent, keywordbuf, number);
     file.read((char *) &node->color, sizeof(TColor));
+    node->parent = node->left = node->right = &nil;
     node->left = Deser(node, file);
     node->right = Deser(node, file);
+    node->left->parent = node->right->parent = node;
     return node;
 }
 TRBTree::TRBTree()
 {
-    this->nil = (TNode *) malloc(sizeof(TNode ));
-    this->nil->parent = this->nil->left = this->nil->right = nullptr;
-    this->nil->keyword = nullptr;
-    this->nil->color = BLACK;
-    this->nil->number = 0;
-    this->root = nil;
+    this->nil.parent = this->nil.left = this->nil.right = nullptr;
+    this->nil.keyword = nullptr;
+    this->nil.color = BLACK;
+    this->nil.number = 0;
+    this->root = &nil;
 }
 
 void TRBTree::Insert(char *keyword, unsigned long long number)
 {
-    TNode *parent = nil;
+    TNode *parent = &nil;
     TNode *current = this->root;
-    int cmp;
-    while (current != nil) {
-        cmp = strcmp(keyword, current->keyword);
+    char cmp;
+    while (current != &nil) {
+        cmp = strcasecmp(keyword, current->keyword);
         parent = current;
         if (cmp < 0) {
             current = current->left;
@@ -263,51 +266,65 @@ void TRBTree::Insert(char *keyword, unsigned long long number)
         }
     }
     TNode *newnode = CreateNode(parent, keyword, number);
-    if (parent == nil) {
+    if (parent == &nil) {
         this->root = newnode;
+    } else if (cmp < 0) {
+        parent->left = newnode;
     } else {
-        if (cmp < 0) {
-            parent->left = newnode;
-        } else {
-            parent->right = newnode;
-        }
+        parent->right = newnode;
     }
     InsertFix(newnode);
     cout << "OK\n";
 }
 void TRBTree::Search(char *keyword)
 {
-    if (this->root == nil) {
-        cout << "NoSuchWord\n";
-        return;
+    TNode *out = this->root;
+    char cmp;
+    while (out != &nil) {
+        if ((cmp = strcasecmp(keyword, out->keyword)) == 0) {
+            break;
+        } else if (cmp < 0) {
+            out = out->left;
+        } else {
+            out = out->right;
+        }
     }
-    TNode *out = Recoursesearch(keyword, this->root);
-    if (out != nil) {
-        cout << "OK: " << out->number << '\n';
+    if (out != &nil) {
+        cout << "OK: " << out->number << "\n";
     } else {
         cout << "NoSuchWord\n";
     }
 }
 void TRBTree::Delete(char *keyword)
 {
-    TNode *node = Recoursesearch(keyword, this->root);
-    if (node == nil || node == nullptr) {
+    TNode *node = this->root;
+    char cmp;
+    while (node != &nil) {
+        if ((cmp = strcasecmp(keyword, node->keyword)) == 0) {
+            break;
+        } else if (cmp < 0) {
+            node = node->left;
+        } else {
+            node = node->right;
+        }
+    }
+    if (node == &nil || node == nullptr) {
         cout << "NoSuchWord\n";
         return;
     }
     TNode *removed = node;
     TNode *newnode = nullptr;
-    if (node->left == nil || node->right == nil) {
+    if (node->left == &nil || node->right == &nil) {
         removed = node;
     } else {
-        removed = Successor(node);
+        removed = Minimum(node->right);
     }
-    if (removed->left != nil) {
+    if (removed->left != &nil) {
         newnode = removed->left;
     } else {
         newnode = removed->right;
     }
-    if (removed->parent == nil) {
+    if (removed->parent == &nil) {
         this->root = newnode;
     } else if (removed == removed->parent->left) {
         removed->parent->left = newnode;
@@ -317,7 +334,9 @@ void TRBTree::Delete(char *keyword)
     newnode->parent = removed->parent;
     if (removed != node) {
         node->number = removed->number;
-        strcpy(node->keyword, removed->keyword);
+        char *tmp_word = node->keyword;
+        node->keyword = removed->keyword;
+        removed->keyword = tmp_word;
     }
     if (removed->color == BLACK) {
         DeleteFix(newnode);
@@ -350,21 +369,17 @@ void TRBTree::Load(const char *path)
         file.close();
         return;
     }
-    TNode *newnode = Deser(nil, file);
-    if (newnode != nil || newnode != nullptr) {
-        if (this->root != nil) {
-            Recoursedestroy(this->root);
-        }
-        this->root = newnode;
+    if (this->root != &nil) {
+        Recoursedestroy(this->root);
     }
+    this->root = Deser(&nil, file);
     file.close();
     cout << "OK\n";
 }
 TRBTree::~TRBTree()
 {
-    if (this->root != nil) {
+    if (this->root != &nil) {
         Recoursedestroy(this->root);
     }
     this->root = nullptr;
-    free(this->nil);
 }

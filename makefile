@@ -1,4 +1,4 @@
-FLAGS=-g -std=c++11 -pedantic -Wall -Werror -Wno-sign-compare -Wno-long-long -lm
+FLAGS=-g -std=c++11 -pedantic -Wall -Werror -Wno-sign-compare -Wno-long-long -lm -O3
 CC=g++
 
 all: rbtree main.cpp

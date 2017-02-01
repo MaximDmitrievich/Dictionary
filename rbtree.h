@@ -5,11 +5,12 @@
 #include <cstdlib>
 #include <cctype>
 #include <cstring>
+#include <string.h>
 
 using namespace std;
 
 
-const int KEY_SIZE = 256;
+const int KEY_SIZE = 257;
 const int TYPE_SIZE = 4;
 const int NAME_SIZE = 20;
 const int NIL = 0;
@@ -29,7 +30,7 @@ private:
         TNode *parent;
     };
     TNode *root;
-    TNode *nil;
+    TNode nil;
 
     TNode *CreateNode(TNode *parent, char *keyword, unsigned long long number);
     TNode *Minimum(TNode *node);
