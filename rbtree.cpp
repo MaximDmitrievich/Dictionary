@@ -66,10 +66,10 @@ void TRBTree::Recoursedestroy(TNode *node)
 
 void TRBTree::LeftRotation(TNode *node)
 {
-TNode *tmp = node->right;
-node->right = tmp->left;
-if (tmp->left != &nil) {
-    tmp->left->parent = node;
+    TNode *tmp = node->right;
+    node->right = tmp->left;
+    if (tmp->left != &nil) {
+        tmp->left->parent = node;
     }
     tmp->parent = node->parent;
     if (node->parent == &nil) {
@@ -227,7 +227,7 @@ TRBTree::TNode *TRBTree::Deser(TNode *parent, ifstream &file)
     size_t length;
     unsigned long long number = 0;
     file.read((char *) &length, sizeof(length));
-    char *keywordbuf = (char *) calloc(sizeof(char), length + 1);
+    char *keywordbuf = (char *) malloc(sizeof(char) * (length + 1));
     file.read(keywordbuf, length);
     keywordbuf[length] = '\0';
     file.read((char *) &number, sizeof(unsigned long long));
@@ -252,7 +252,7 @@ void TRBTree::Insert(char *keyword, unsigned long long number)
 {
     TNode *parent = &nil;
     TNode *current = this->root;
-    char cmp;
+    char cmp = 0;
     while (current != &nil) {
         cmp = strcasecmp(keyword, current->keyword);
         parent = current;
@@ -265,7 +265,13 @@ void TRBTree::Insert(char *keyword, unsigned long long number)
             return;
         }
     }
-    TNode *newnode = CreateNode(parent, keyword, number);
+    char *keywordin = (char *) malloc(sizeof(char) * KEY_SIZE);
+    if (keyword == nullptr) {
+        cout << "ERROR: Couldn't create variable keyword\n";
+        return;
+    }
+    strcpy(keywordin, keyword);
+    TNode *newnode = CreateNode(parent, keywordin, number);
     if (parent == &nil) {
         this->root = newnode;
     } else if (cmp < 0) {
