@@ -1,6 +1,6 @@
 #include "rbtree.h"
 
-TRBTree::TNode *TRBTree::CreateNode(TNode *parent, char *keyword, unsigned long long number)
+TRBTree::TNode *TRBTree::CreateNode(TNode *parent, char *keyword_, unsigned long long number)
 {
     TNode *node = (TNode *) malloc(sizeof(TNode));
     if (node == nullptr) {
@@ -8,7 +8,8 @@ TRBTree::TNode *TRBTree::CreateNode(TNode *parent, char *keyword, unsigned long 
         exit(EXIT_SUCCESS);
     }
     node->number = number;
-    node->keyword = keyword;
+    node->keyword = (char *) malloc(sizeof(char) * (strlen(keyword_) + 1));
+    strcpy(node->keyword, keyword_);
     node->color = RED;
     node->left = &nil;
     node->right = &nil;
@@ -265,13 +266,7 @@ void TRBTree::Insert(char *keyword, unsigned long long number)
             return;
         }
     }
-    char *keywordin = (char *) malloc(sizeof(char) * KEY_SIZE);
-    if (keyword == nullptr) {
-        cout << "ERROR: Couldn't create variable keyword\n";
-        return;
-    }
-    strcpy(keywordin, keyword);
-    TNode *newnode = CreateNode(parent, keywordin, number);
+    TNode *newnode = CreateNode(parent, keyword, number);
     if (parent == &nil) {
         this->root = newnode;
     } else if (cmp < 0) {
@@ -323,7 +318,7 @@ void TRBTree::Delete(char *keyword)
     if (node->left == &nil || node->right == &nil) {
         removed = node;
     } else {
-        removed = Minimum(node->right);
+        removed = Successor(node);
     }
     if (removed->left != &nil) {
         newnode = removed->left;

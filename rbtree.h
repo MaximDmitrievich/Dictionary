@@ -3,9 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
-#include <cctype>
 #include <cstring>
-#include <string.h>
 
 using namespace std;
 
@@ -32,7 +30,7 @@ private:
     TNode *root;
     TNode nil;
 
-    TNode *CreateNode(TNode *parent, char *keyword, unsigned long long number);
+    TNode *CreateNode(TNode *parent, char *keyword_, unsigned long long number);
     TNode *Minimum(TNode *node);
     TNode *Successor(TNode *node);
 
