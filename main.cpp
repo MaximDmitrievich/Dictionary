@@ -38,6 +38,5 @@ int main(int argv, char **argc)
             dict->Search(buf);
         }
     }
-    delete dict;
     return 0;
 }
