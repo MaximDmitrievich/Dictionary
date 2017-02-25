@@ -59,7 +59,7 @@ void TRBTree::Recoursedestroy(TNode *node)
     if (node->right != &nil) {
         Recoursedestroy(node->right);
     }
-    free(node->keyword);
+    //free(node->keyword);
     TNode *tmp = node;
     free(tmp);
     node = &nil;
